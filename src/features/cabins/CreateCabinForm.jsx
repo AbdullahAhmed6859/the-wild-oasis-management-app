@@ -12,7 +12,7 @@ import useEditCabin from "./useEditCabin";
 function CreateCabinForm({
   type = "create",
   cabinToEdit = { id: undefined },
-  closeEditForm,
+  closeModal,
 }) {
   const { id: cabinId, ...editValues } = cabinToEdit;
   const isEditSession = type === "edit";
@@ -20,8 +20,8 @@ function CreateCabinForm({
   const {
     register,
     handleSubmit,
-    reset,
     getValues,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: isEditSession ? editValues : {},
@@ -45,10 +45,15 @@ function CreateCabinForm({
           newCabinData,
           id: cabinId,
         },
-        { onSuccess: closeEditForm }
+        { onSuccess: () => closeModal?.() }
       );
     else {
-      createCabin(newCabinData, { onSuccess: reset });
+      createCabin(newCabinData, {
+        onSuccess: () => {
+          reset();
+          closeModal?.();
+        },
+      });
     }
   }
 
@@ -57,7 +62,10 @@ function CreateCabinForm({
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={closeModal ? "modal" : "regular"}
+    >
       <FormRow label="Name" error={errors?.name?.message}>
         <Input
           type="text"
@@ -131,7 +139,11 @@ function CreateCabinForm({
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => closeModal?.()}
+        >
           Cancel
         </Button>
         <Button disabled={isWorking}>

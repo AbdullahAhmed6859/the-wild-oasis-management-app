@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import useDeleteCabin from "./useDeleteCabin";
 import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
 import useDuplicateCabin from "./useDuplicateCabin";
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete";
 
 const TableRow = styled.div`
   display: grid;
@@ -56,8 +57,6 @@ const CabinTools = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const [showForm, setShowForm] = useState(false);
-
   const {
     id: cabinId,
     name,
@@ -85,21 +84,33 @@ function CabinRow({ cabin }) {
           >
             <HiSquare2Stack />
           </button>
-          <button onClick={() => setShowForm((state) => !state)}>
-            <HiPencil />
-          </button>
-          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
-            <HiTrash />
-          </button>
+          <Modal>
+            <Modal.Open opens="edit-cabin">
+              <button>
+                <HiPencil />
+              </button>
+            </Modal.Open>
+
+            <Modal.Window name="edit-cabin">
+              <CreateCabinForm type="edit" cabinToEdit={cabin} />
+            </Modal.Window>
+
+            <Modal.Open opens="delete-cabin">
+              <button>
+                <HiTrash />
+              </button>
+            </Modal.Open>
+
+            <Modal.Window name="delete-cabin">
+              <ConfirmDelete
+                disabled={isDeleting}
+                resourceName="cabins"
+                onConfirm={() => deleteCabin(cabinId)}
+              ></ConfirmDelete>
+            </Modal.Window>
+          </Modal>
         </CabinTools>
       </TableRow>
-      {showForm && (
-        <CreateCabinForm
-          type="edit"
-          cabinToEdit={cabin}
-          closeEditForm={() => setShowForm(false)}
-        />
-      )}
     </>
   );
 }
