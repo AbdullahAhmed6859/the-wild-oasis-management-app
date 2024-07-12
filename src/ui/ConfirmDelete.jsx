@@ -2,6 +2,7 @@
 import styled from "styled-components";
 import Button from "./Button";
 import Heading from "./Heading";
+import { useEffect, useRef } from "react";
 
 const StyledConfirmDelete = styled.div`
   width: 40rem;
@@ -22,6 +23,11 @@ const StyledConfirmDelete = styled.div`
 `;
 
 function ConfirmDelete({ resourceName, onConfirm, disabled, closeModal }) {
+  const btnRef = useRef();
+  useEffect(function () {
+    btnRef.current.focus();
+  }, []);
+
   return (
     <StyledConfirmDelete>
       <Heading as="h3">Delete {resourceName}</Heading>
@@ -34,7 +40,12 @@ function ConfirmDelete({ resourceName, onConfirm, disabled, closeModal }) {
         <Button variation="secondary" disabled={disabled} onClick={closeModal}>
           Cancel
         </Button>
-        <Button variation="danger" disabled={disabled} onClick={onConfirm}>
+        <Button
+          variation="danger"
+          disabled={disabled}
+          onClick={onConfirm}
+          ref={btnRef}
+        >
           Delete
         </Button>
       </div>
