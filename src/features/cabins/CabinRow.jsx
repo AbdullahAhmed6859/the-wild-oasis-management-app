@@ -8,6 +8,7 @@ import useDuplicateCabin from "./useDuplicateCabin";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
+import Menus from "../../ui/Menus";
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -78,25 +79,32 @@ function CabinRow({ cabin }) {
       <Price>{formatCurrency(regularPrice)}</Price>
       {discount > 0 ? <Discount>{discount}</Discount> : <span>&mdash;</span>}
       <CabinTools>
-        <button onClick={() => duplicateCabin(cabin)} disabled={isDuplicating}>
-          <HiSquare2Stack />
-        </button>
         <Modal>
-          <Modal.Open opens="edit-cabin">
-            <button>
-              <HiPencil />
-            </button>
-          </Modal.Open>
+          <Menus.Menu>
+            <Menus.Toggle id={cabinId} />
+
+            <Menus.List id={cabinId}>
+              <Modal.Open opens="edit-cabin">
+                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+              </Modal.Open>
+
+              <Modal.Open opens="delete-cabin">
+                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+              </Modal.Open>
+
+              <Menus.Button
+                icon={<HiSquare2Stack />}
+                onClick={() => duplicateCabin(cabin)}
+                disabled={isDuplicating}
+              >
+                Duplicate
+              </Menus.Button>
+            </Menus.List>
+          </Menus.Menu>
 
           <Modal.Window name="edit-cabin">
             <CreateCabinForm type="edit" cabinToEdit={cabin} />
           </Modal.Window>
-
-          <Modal.Open opens="delete-cabin">
-            <button>
-              <HiTrash />
-            </button>
-          </Modal.Open>
 
           <Modal.Window name="delete-cabin">
             <ConfirmDelete
