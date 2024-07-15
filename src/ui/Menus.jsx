@@ -77,25 +77,24 @@ function Menus({ children }) {
     <MenusContext.Provider
       value={{ openId, open: setIsOpenId, close, position, setPosition }}
     >
-      <StyledMenu>
-        <StyledButton>{children}</StyledButton>
-      </StyledMenu>
+      {children}
     </MenusContext.Provider>
   );
 }
 
-function Toggle({ cabinId, id }) {
+function Toggle({ id }) {
   const { openId, open, close, setPosition } = useContext(MenusContext);
 
   function handleClick(e) {
+    if (openId !== "" && openId === String(id)) return close();
+
     const rect = e.target.closest("button").getBoundingClientRect();
     setPosition({
-      x: window.innerWidth - (rect.width + rect.x),
-      y: rect.height + rect.y + 8,
+      x: window.innerWidth - rect.width - rect.x,
+      y: rect.y + rect.height + 8,
     });
 
-    if (openId === "" || openId !== id) open(id);
-    else close();
+    open(String(id));
   }
 
   return (
@@ -108,7 +107,8 @@ function Toggle({ cabinId, id }) {
 function List({ id, children }) {
   const { openId, position, close } = useContext(MenusContext);
   const ref = useOutsideClick(close);
-  if (openId !== id) return null;
+
+  if (openId !== String(id)) return null;
 
   return createPortal(
     <StyledList position={{ x: position.x, y: position.y }} ref={ref}>
@@ -125,6 +125,7 @@ function Button({ children, icon, onClick, disabled }) {
     onClick?.();
     close();
   }
+
   return (
     <li>
       <StyledButton onClick={handleClick} disabled={disabled}>
